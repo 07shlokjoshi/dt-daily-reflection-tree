@@ -1,0 +1,304 @@
+{
+  "metadata": {
+    "version": "1.0",
+    "name": "Daily Reflection Tree",
+    "description": "A deterministic end-of-day reflection tool walking three psychological axes.",
+    "axes": {
+      "axis1": {
+        "name": "Locus",
+        "spectrum": "External (Victim) ← → Internal (Victor)",
+        "signals": ["internal", "external"],
+        "sources": ["Rotter (1954) Locus of Control", "Dweck (2006) Growth Mindset"]
+      },
+      "axis2": {
+        "name": "Orientation",
+        "spectrum": "Entitlement ← → Contribution",
+        "signals": ["entitlement", "contribution"],
+        "sources": ["Campbell et al. (2004) Psychological Entitlement", "Organ (1988) Organizational Citizenship Behavior"]
+      },
+      "axis3": {
+        "name": "Radius",
+        "spectrum": "Self-Centric ← → Altrocentric",
+        "signals": ["self", "team", "others"],
+        "sources": ["Maslow (1969) Self-Transcendence", "Batson (2011) Perspective-Taking"]
+      }
+    }
+  },
+
+  "summaryTemplates": {
+    "axis1": {
+      "internal": "you owned your responses today — you stayed in the driver's seat even when outcomes were uncertain",
+      "external": "circumstances felt bigger than your choices today — worth noticing where you did have agency"
+    },
+    "axis2": {
+      "contribution": "you gave without keeping score — your focus was on others' success, not your own ledger",
+      "entitlement": "the internal scorecard was running today — what you gave versus what you felt you deserved"
+    },
+    "axis3": {
+      "self": "your frame was personal and close — useful for focus, but narrow for meaning",
+      "team": "you held the team in mind alongside yourself — your concern extended to your immediate circle",
+      "others": "you thought beyond the immediate — toward people your work serves, even ones you may never meet"
+    }
+  },
+
+  "nodes": [
+    {
+      "id": "START",
+      "type": "start",
+      "text": "Good evening. Take a breath — today is almost done.\n\nLet's spend a few minutes with it. Not to judge it. Just to see it clearly.",
+      "next": "A1_OPEN"
+    },
+
+    {
+      "id": "A1_OPEN",
+      "type": "question",
+      "text": "How would you describe your day overall?",
+      "options": [
+        { "label": "Productive", "signal": null },
+        { "label": "Mixed", "signal": null },
+        { "label": "Tough", "signal": null },
+        { "label": "Frustrating", "signal": null }
+      ],
+      "next": "A1_D1"
+    },
+
+    {
+      "id": "A1_D1",
+      "type": "decision",
+      "comment": "Routes based on the opening tone of the day",
+      "routes": [
+        { "condition": "answer(A1_OPEN)=Productive|Mixed", "target": "A1_Q1_HIGH" },
+        { "condition": "answer(A1_OPEN)=Tough|Frustrating", "target": "A1_Q1_LOW" }
+      ]
+    },
+
+    {
+      "id": "A1_Q1_HIGH",
+      "type": "question",
+      "text": "You said '{A1_OPEN}'. When things went well today, what made it happen?",
+      "options": [
+        { "label": "I prepared and planned ahead", "signal": "axis1:internal" },
+        { "label": "I adapted when things shifted", "signal": "axis1:internal" },
+        { "label": "The team came through for me", "signal": "axis1:external" },
+        { "label": "It just worked out somehow", "signal": "axis1:external" }
+      ],
+      "next": "A1_Q2"
+    },
+
+    {
+      "id": "A1_Q1_LOW",
+      "type": "question",
+      "text": "When things got difficult today, what was your first instinct?",
+      "options": [
+        { "label": "Figure out what I could control", "signal": "axis1:internal" },
+        { "label": "Wait for someone else to step in", "signal": "axis1:external" },
+        { "label": "Push through alone", "signal": "axis1:internal" },
+        { "label": "Feel overwhelmed and stuck", "signal": "axis1:external" }
+      ],
+      "next": "A1_Q2B"
+    },
+
+    {
+      "id": "A1_Q2",
+      "type": "question",
+      "text": "Think of one specific decision you made today. How did you handle it?",
+      "options": [
+        { "label": "Took full ownership of the outcome", "signal": "axis1:internal" },
+        { "label": "Adjusted my approach when I saw it wasn't working", "signal": "axis1:internal" },
+        { "label": "Waited to see what others would do first", "signal": "axis1:external" },
+        { "label": "Let someone else take the lead", "signal": "axis1:external" }
+      ],
+      "next": "A1_D2"
+    },
+
+    {
+      "id": "A1_Q2B",
+      "type": "question",
+      "text": "Looking back at the hardest moment today — were there choices you had?",
+      "options": [
+        { "label": "Yes — I could have acted differently", "signal": "axis1:internal" },
+        { "label": "Yes — I could have asked for help sooner", "signal": "axis1:internal" },
+        { "label": "Not really — circumstances decided it", "signal": "axis1:external" },
+        { "label": "I didn't stop to think about it", "signal": "axis1:external" }
+      ],
+      "next": "A1_D2"
+    },
+
+    {
+      "id": "A1_D2",
+      "type": "decision",
+      "comment": "Routes based on accumulated axis1 signals across the two questions",
+      "routes": [
+        { "condition": "dominant(axis1)=internal", "target": "A1_REFLECT_INT" },
+        { "condition": "dominant(axis1)=external", "target": "A1_REFLECT_EXT" }
+      ]
+    },
+
+    {
+      "id": "A1_REFLECT_INT",
+      "type": "reflection",
+      "text": "You stayed in the driver's seat today — even when things were uncertain.\n\nNoticing that you chose '{A1_Q2}' is not small. Agency isn't about controlling outcomes. It's about owning your responses. You did that.",
+      "next": "BRIDGE_1_2"
+    },
+
+    {
+      "id": "A1_REFLECT_EXT",
+      "type": "reflection",
+      "text": "Some days pull your attention outward — to what others did or didn't do, to circumstances beyond your reach. That's real, and it's human.\n\nBut somewhere today, even quietly, you made a call. The fact that you're here reflecting on it? That's already a sign of agency.",
+      "next": "BRIDGE_1_2"
+    },
+
+    {
+      "id": "BRIDGE_1_2",
+      "type": "bridge",
+      "text": "Now let's shift from how you handled things — to what you gave today.",
+      "next": "A2_OPEN"
+    },
+
+    {
+      "id": "A2_OPEN",
+      "type": "question",
+      "text": "Think about your interactions today. What stands out most?",
+      "options": [
+        { "label": "I helped someone who needed it", "signal": "axis2:contribution" },
+        { "label": "I went beyond what was asked of me", "signal": "axis2:contribution" },
+        { "label": "I expected recognition I didn't get", "signal": "axis2:entitlement" },
+        { "label": "I felt others weren't pulling their weight", "signal": "axis2:entitlement" }
+      ],
+      "next": "A2_Q2"
+    },
+
+    {
+      "id": "A2_Q2",
+      "type": "question",
+      "text": "In your most important interaction today, what was driving you underneath?",
+      "options": [
+        { "label": "I wanted the other person to succeed", "signal": "axis2:contribution" },
+        { "label": "I wanted to improve the outcome for everyone", "signal": "axis2:contribution" },
+        { "label": "I wanted credit for what I'd done", "signal": "axis2:entitlement" },
+        { "label": "I wanted others to notice my effort", "signal": "axis2:entitlement" }
+      ],
+      "next": "A2_Q3"
+    },
+
+    {
+      "id": "A2_Q3",
+      "type": "question",
+      "text": "Was there a moment today when you did something helpful without being asked?",
+      "options": [
+        { "label": "Yes — and I didn't expect anything in return", "signal": "axis2:contribution" },
+        { "label": "Yes — and I hoped someone would notice", "signal": "axis2:entitlement" },
+        { "label": "Not really — I stayed in my lane", "signal": "axis2:entitlement" },
+        { "label": "I looked for opportunities but didn't act", "signal": "axis2:entitlement" }
+      ],
+      "next": "A2_D1"
+    },
+
+    {
+      "id": "A2_D1",
+      "type": "decision",
+      "comment": "Routes based on accumulated axis2 signals",
+      "routes": [
+        { "condition": "dominant(axis2)=contribution", "target": "A2_REFLECT_CONTRIB" },
+        { "condition": "dominant(axis2)=entitlement", "target": "A2_REFLECT_ENTITLE" }
+      ]
+    },
+
+    {
+      "id": "A2_REFLECT_CONTRIB",
+      "type": "reflection",
+      "text": "Today, you gave more than the minimum.\n\n'{A2_OPEN}' — that's the kind of action that quietly shapes a team's culture. The people who shift how teams feel are rarely the loudest ones in the room. They're the ones who act before they're asked.",
+      "next": "BRIDGE_2_3"
+    },
+
+    {
+      "id": "A2_REFLECT_ENTITLE",
+      "type": "reflection",
+      "text": "There's nothing wrong with wanting recognition — effort deserves acknowledgment.\n\nBut when the expectation of reward shapes the action, the action gets smaller. Worth sitting with: what would you have done today if no one were watching and no credit were coming?",
+      "next": "BRIDGE_2_3"
+    },
+
+    {
+      "id": "BRIDGE_2_3",
+      "type": "bridge",
+      "text": "We've looked at how you acted, and what you gave. Now let's zoom out — beyond yourself.",
+      "next": "A3_OPEN"
+    },
+
+    {
+      "id": "A3_OPEN",
+      "type": "question",
+      "text": "When you think about today's biggest challenge — who comes to mind?",
+      "options": [
+        { "label": "Mostly just me and my work", "signal": "axis3:self" },
+        { "label": "My team — we were all in it together", "signal": "axis3:team" },
+        { "label": "A specific colleague who had it harder than me", "signal": "axis3:others" },
+        { "label": "The customer or end user we're serving", "signal": "axis3:others" }
+      ],
+      "next": "A3_Q2"
+    },
+
+    {
+      "id": "A3_Q2",
+      "type": "question",
+      "text": "How did your work today land for people beyond yourself?",
+      "options": [
+        { "label": "It mostly affected my own deliverables", "signal": "axis3:self" },
+        { "label": "It moved something forward for the team", "signal": "axis3:team" },
+        { "label": "It directly helped a colleague or user", "signal": "axis3:others" },
+        { "label": "It created value for people I may never meet", "signal": "axis3:others" }
+      ],
+      "next": "A3_Q3"
+    },
+
+    {
+      "id": "A3_Q3",
+      "type": "question",
+      "text": "Did you check in on someone today — not for a task, but just as a person?",
+      "options": [
+        { "label": "Yes — and it felt genuine", "signal": "axis3:others" },
+        { "label": "Yes — quickly, mostly out of habit", "signal": "axis3:team" },
+        { "label": "No — I was too focused on my own work", "signal": "axis3:self" },
+        { "label": "No — but I noticed someone who could have used it", "signal": "axis3:team" }
+      ],
+      "next": "A3_D1"
+    },
+
+    {
+      "id": "A3_D1",
+      "type": "decision",
+      "comment": "Routes based on accumulated axis3 signals",
+      "routes": [
+        { "condition": "dominant(axis3)=self", "target": "A3_REFLECT_SELF" },
+        { "condition": "dominant(axis3)=team|others", "target": "A3_REFLECT_OTHER" }
+      ]
+    },
+
+    {
+      "id": "A3_REFLECT_SELF",
+      "type": "reflection",
+      "text": "Today your focus was tight — on your own work, your own outcomes. That's not a flaw; focus matters.\n\nBut the most durable source of meaning at work isn't personal achievement. It's realizing your work matters to someone else. Tomorrow: look for one person your work touches.",
+      "next": "SUMMARY"
+    },
+
+    {
+      "id": "A3_REFLECT_OTHER",
+      "type": "reflection",
+      "text": "You thought beyond yourself today. You saw '{A3_OPEN}' as part of the challenge — not just your own deliverable.\n\nThat's perspective-taking in action. It's also, quietly, the antidote to a lot of workplace suffering. The wider your concern, the less any single moment can shrink you.",
+      "next": "SUMMARY"
+    },
+
+    {
+      "id": "SUMMARY",
+      "type": "summary",
+      "text": "Here's how today looked across three dimensions:\n\n**Agency (Axis 1):** {axis1.summary}\n\n**Contribution (Axis 2):** {axis2.summary}\n\n**Perspective (Axis 3):** {axis3.summary}\n\nThese aren't scores. They're mirrors. What you see in them is yours to work with.",
+      "next": "END"
+    },
+
+    {
+      "id": "END",
+      "type": "end",
+      "text": "That's it for today.\n\nYou showed up, you reflected — and that's already more than most. See you tomorrow."
+    }
+  ]
+}
